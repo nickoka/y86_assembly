@@ -1,0 +1,123 @@
+.pos 0
+Init:
+    irmovl Stack, %ebp
+    irmovl Stack, %esp
+    
+    call Main # Execute main program
+    halt # Terminate program 
+    
+.pos 0x104
+#Array of 10 elements
+array:
+    .long 0x8
+    .long 0x2
+    .long 0x3
+    .long 0x1
+    .long 0x5
+    .long 0x4
+    .long 0x3
+    .long 0x7
+    .long 0x1
+    .long 0x6
+    
+    
+swap: // int swap(int *xp, int *yp)
+    pushl %ebp
+    rrmovl %esp, %ebp
+    
+    pushl %ebx
+    mrmovl 8(%ebp), %ecx
+    mrmovl 12(%ebp), %edx
+    mrmovl (%edx), %eax
+    mrmovl (%ecx), %ebx
+    rmmovl %eax, (%ecx)
+    rmmovl %ebx, (%edx)
+    
+    rrmovl %edx, %edi
+    
+    popl %ebx
+    popl %ebp
+    ret
+    
+sort: // int sort(int* arr, int length)
+    #Started from findMin
+    pushl %ebp // Saves ebp
+    rrmovl %esp, %ebp // ebp = esp
+    
+    pushl %ebx // Saves ebx
+    pushl %esi // Saves esi
+    pushl %edi // Saves edi
+    
+    mrmovl 8(%ebp), %ecx // ecx = arr
+    mrmovl 12(%ebp), %edx // edx = length
+
+    irmovl 1, %esi // Create incrementor; esi = 1
+    rrmovl %edx, %edi 
+    pushl %edi 
+    rrmovl %edx, %ebx  
+    
+    L1:
+        popl %edi // Restores edi
+        irmovl 1, %esi 
+        subl %esi, %edi 
+        rrmovl %ebx, %edx // edx = ebx
+        je End // End when edi = 0
+        rrmovl %ecx, %eax
+        irmovl 1, %ebx
+        
+    L2:
+        pushl %ebx
+        addl %esi, %ebx
+        pushl %ebx
+        irmovl 4, %ebx // ebx = 4
+        addl %ebx, %ecx
+        pushl %ecx // Saves ecx and eax
+        pushl %eax
+        
+        mrmovl (%ecx), %ecx // ecx = array[j]
+        mrmovl (%eax), %eax // eax = min
+        
+        popl %eax // Restores eax and ecx
+        popl %ecx 
+        subl %esi,%edx 
+        jne L2
+        rrmovl %ecx, %eax
+
+    pushl %ecx
+    pushl %eax
+    pushl %edi
+    call swap // swaps the minimum value (hopefully)
+    // Crashes at some point looping. Not sure why. 
+    popl %edi 
+    subl %esi, %edi // Decrements by 1
+    
+    jg L1 // Jumps to the loop if edi > 0
+        
+    End:
+        popl %esi
+        popl %ebx
+        popl %ebp
+        ret
+    
+    popl %ebx
+    popl %ebp
+    ret
+
+Main:
+    pushl %ebp
+    rrmovl %esp, %ebp
+    
+    irmovl 5, %eax
+    pushl %eax
+    irmovl array, %eax
+    pushl %eax
+    
+    call sort
+    
+    rrmovl %ebp, %esp
+    popl %ebp
+    ret
+    
+.pos 0x100
+Stack:
+    

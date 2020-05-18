@@ -1,0 +1,33 @@
+.pos 0
+Init:
+    irmovl Stack, %ebp
+    irmovl Stack, %esp
+    call Main
+    
+Main:
+
+    pushl %ebp
+
+    call swap
+    brk
+    
+swap: // swap(int *xp, int *yp)
+
+    pushl %ebp
+    rrmovl %esp,%ebp
+    pushl %ebx 
+    
+    mrmovl 8(%ebp),%eax
+    mrmovl 12(%ebp),%edx
+    
+    mrmovl (%eax),%ecx
+    mrmovl (%edx),%ebx
+
+    #Not sure how to get the value to the point value swapped
+    
+    popl %ebx
+    popl %ebp
+    ret
+    
+.pos 0x100
+Stack:
